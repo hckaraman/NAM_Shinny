@@ -129,7 +129,7 @@ class Nam(object):
                 lb = [0.01, 0.01, 0.01, 200, 10, 0.01, 0.01, 0.01, 500, 0, -2]
                 ub = [50, 1000, 1, 1000, 50, 0.99, 0.99, 0.99, 5000, 4, 4]
                 args = (self.P, self.T, self.E, self.area, self.Spinoff, self.Qobs)
-                xopt, fopt, res = pso(self.Objective, lb, ub, f_ieqcons=None, args=args, maxiter=self.maxiter, debug=True)
+                xopt, fopt  = pso(self.Objective, lb, ub, f_ieqcons=None, args=args, maxiter=self.maxiter, debug=True)
                 self.Qsim, self.St = nam_method(
                     xopt,self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=False)
                 self.parameters = xopt
@@ -145,10 +145,10 @@ class Nam(object):
             self.parameters = self.initial
 
     def update(self):
-        fit = self.interpolation()
-        self.Qfit = fit(self.Qobs)
+        # fit = self.interpolation()
+        # self.Qfit = fit(self.Qobs)
         self.df['Qsim'] = self.Qsim
-        self.df['Qfit'] = self.Qfit
+        # self.df['Qfit'] = self.Qfit
         self.flowduration = pd.DataFrame()
         self.flowduration['Qsim_x'] = self.flowdur(self.Qsim)[0]
         self.flowduration['Qsim_y'] = self.flowdur(self.Qsim)[1]
@@ -298,14 +298,18 @@ class Nam(object):
         return ax
 
 
-# Sample Run
-if __name__ == '__main__':
+
+def run():
     params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
         , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
         , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
     States = np.array([0, 0, 0.9 * params[1], 0, 0, 0, 0, 0.1])
-    n = Nam(360, params,States, calibration=True, method='PSO', Objective_fun='nse',maxiter=20)
+    n = Nam(360, params,States, calibration=True, method='PSO', Objective_fun='nse',maxiter=3)
     n.process_path = os.path.split(os.path.abspath(__file__))[0]
     n.Data_file = os.path.join(n.process_path,"Data", "L0123001_2005_2012.csv")
     n.run()
+    n.stats()
+    n.update()
     n.draw()
+
+run()
