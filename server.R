@@ -13,6 +13,8 @@ library(reticulate)
 library(plotly)
 library(vroom)
 library(hrbrthemes)
+library(openxlsx)
+
 
 use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
 # use_python(python = "/usr/bin/python3.8", required = TRUE)
@@ -27,7 +29,8 @@ shinyServer(function(input, output, session) {
   
   data <- reactive({ 
     req(input$file1) ## ?req #  require that the input is available
-    
+    f <- list.files('./Data/', include.dirs = F, full.names = T, recursive = T)
+    file.remove(f)
     inFile <- input$file1 
     
     # tested with a following dataset: write.csv(mtcars, "mtcars.csv")
@@ -57,8 +60,46 @@ shinyServer(function(input, output, session) {
                 ,input$ck12, input$tof, input$tif, input$tg
                 , input$ckbf,input$csnow, 2)
     # print(input$objective)
+    
+    ## Results
     temp <- run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter) 
     temp[[1]]$date <- as.Date(row.names(temp[[1]]), "%Y-%m-%d")
+    
+    
+    ### parameters 
+    par <- c("Umax","Lmax","CQOF","CKIF","CK12","TOF","TIF","TG","CKBF","Csnow","Snowtemp")
+    par_v <- c("Max W.C in the surface storage","Max W.C in root zone storage","Overland flow runoff coefficient","Time Constant for Interflow","Time constant for routing overland flow","Root zone treshold value for overland flow","Root zone treshold value for inter flow","Root zone treshold value for groundwater recharge","Time constant for routing base flow","Degree day coefficient","Snow melt temp")
+    df <- data.frame(par,par_v,temp[[2]])
+    names(df) <- c("Parameter","Description","Value")
+    
+    ### Stats
+    tt <- temp[[3]]
+    metric <- c()
+    value <- c()
+    for(i in 1:length(temp[[3]])){
+      
+      metric <- c(metric, tt[[i]][[1]])
+      value <- c(value, tt[[i]][[2]])
+      
+    }
+    
+    par <- c("Agreement Index (d) developed by Willmott (1981)","BIAS","Correlation Coefficient","Covariance ","Decomposed MSE developed by Kobayashi and Salam (2000","Kling-Gupta Efficiency","Logarithmic probability distribution","Log Nash-Sutcliffe model efficiency","Mean Absolute Error","Mean Squared Error","Nash-Sutcliffe model efficinecy","Procentual Bias","Root Mean Squared Error","Relative Root Mean Squared Error","Coefficient of Determination","RMSE-observations standard deviation ratio","Volume Error (Ve)")
+    df_stat <- data.frame(par, value) 
+    names(df_stat) <- c("Metric","Value")
+    
+    ## Flow duration
+    
+    df_flow <- temp[[4]]
+    
+    
+    ### States
+
+    df_states <- temp[[5]]
+    df_states$Date <- as.Date(df_states$Date,"%Y-%m-%d")
+    
+    list_of_datasets <- list("NAM_Results" = temp[[1]], "NAM_Parameters" = df,"Model_Performance" = df_stat,"Flow_Duration"= df_flow,"States"=df_states)
+    write.xlsx(list_of_datasets, file = './Data/Results.xlsx')
+    
     temp
   })
   
@@ -203,12 +244,15 @@ shinyServer(function(input, output, session) {
   # })
   
   
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("Results.xlsx", sep='')
+    },
+    content = function(file) {
+      myfile <- srcpath <- './Data/Results.xlsx'
+      file.copy(myfile, file)
+    }
+  )
+  
 })
-
-plotList <- function(nplots) {
-  lapply(seq_len(nplots), function(x) plot_ly())
-}
-s1 <- subplot(plotList(6), nrows = 2, shareX = TRUE, shareY = TRUE)
-
-
 
