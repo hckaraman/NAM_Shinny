@@ -1,6 +1,5 @@
 library(shiny)
 library(RSQLite)
-library(leaflet)
 library(plotly)
 library(shinyWidgets)
 

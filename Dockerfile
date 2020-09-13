@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
 
 # install R packages required 
 # (change it dependeing on the packages you need)
-RUN R -e 'install.packages(c("shiny","shinyFiles","RSQLite","stringr","ggplot2","zoo","DT","sf","rgdal","tidyverse","raster","reticulate","shinydashboard","plotly","vroom","hrbrthemes","openxlsx"), repos="http://cran.rstudio.com/")'
+RUN R -e 'install.packages(c("shiny","shinyFiles","shinyWidgets","RSQLite","stringr","ggplot2","zoo","DT","sf","rgdal","tidyverse","raster","reticulate","shinydashboard","plotly","vroom","hrbrthemes","openxlsx"), repos="http://cran.rstudio.com/")'
 
 # copy the app to the image
 
