@@ -32,7 +32,7 @@ RUN R -e 'install.packages(c("shiny","shinyFiles","shinyWidgets","RSQLite","stri
 COPY NAM_Shinny.Rproj .
 COPY server.R .
 COPY ui.R .
-COPY Nam/ .
+COPY Nam/ ./Nam
 copy requirements.txt .
 
 

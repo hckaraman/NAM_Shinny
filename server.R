@@ -16,8 +16,8 @@ library(hrbrthemes)
 library(openxlsx)
 
 
-use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
-# use_python(python = "/usr/bin/python3.8", required = TRUE)
+# use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
+use_python(python = "/usr/bin/python3", required = TRUE)
 
 # py_config()
 setwd('./Nam')
