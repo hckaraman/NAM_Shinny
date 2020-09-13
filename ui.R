@@ -5,8 +5,6 @@ library(plotly)
 library(shinyWidgets)
 
 
-files <- Sys.glob(file.path('./Data', "*.csv"))
-print(files)
 shinyUI(pageWithSidebar(
   headerPanel("Drought Analysis"),
   sidebarPanel(h3("Upload Data"),fluidRow(fileInput('file1', 'Choose CSV File',
@@ -15,8 +13,8 @@ shinyUI(pageWithSidebar(
                                                              '.csv'))),
     
                h3("NAM Parameters"),fluidRow(
-    column(6,numericInput("area", "Area:", 100, min = 10, max = 1000)),
-    column(6,selectInput("basin", "Select Basin", c("Alihoca","Cakit","Darbogaz"), selected = "Alihoca", multiple = FALSE)),
+    column(4,numericInput("area", "Area:", 100, min = 10, max = 1000),),
+    # column(6,selectInput("basin", "Select Basin", c("Alihoca","Cakit","Darbogaz"), selected = "Alihoca", multiple = FALSE)),
     column(12,materialSwitch(inputId = "cal", label = "Calibration", inline = T,right = FALSE,status = "danger")),
     column(4,selectInput("method", "Method:",
                          c("SLSQP","PSO"), selected = "SLSP", multiple = FALSE)),
