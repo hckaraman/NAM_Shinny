@@ -21,7 +21,8 @@ np.seterr(all='ignore')
 
 class Nam(object):
 
-    def __init__(self, area, input_parameters,States, calibration=False, method='PSO', Objective_fun='nashsutcliffe',maxiter=15):
+    def __init__(self, area, input_parameters, States, calibration=False, method='PSO', Objective_fun='nashsutcliffe',
+                 maxiter=15):
         self._working_directory = None
         self.Data_file = None
         self.df = None
@@ -93,7 +94,7 @@ class Nam(object):
 
     def Objective(self, x, *args):
         self.Qsim, self.St = nam_method(
-            x,self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=True)
+            x, self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=True)
         # n = math.sqrt((sum((self.Qsim - self.Qobs) ** 2)) / len(self.Qobs))
         # n = self.nash(self.Qobs, self.Qsim)
         # mean_observed = np.nanmean(self.Qobs)
@@ -102,19 +103,19 @@ class Nam(object):
         # n = 1 - (numerator / denominator)
         # Q = np.where(self.Qobs > 10, np.nan, self.Qobs)
         wu = 15
-        if self.Objective_fun == 'nse':
+        if self.Objective_fun == 'NSE':
             n = 1 - obj.nashsutcliffe(self.Qobs[wu:], self.Qsim[wu:])
-        elif self.Objective_fun == 'kge':
+        elif self.Objective_fun == 'KGE':
             n = 1 - obj.kge(self.Qobs, self.Qsim)
-        elif self.Objective_fun == 'volume':
-            n = obj.volume_error(self.Qobs,self.Qsim)
-        elif self.Objective_fun == 'rmse':
+        elif self.Objective_fun == 'Volume Error':
+            n = obj.volume_error(self.Qobs, self.Qsim)
+        elif self.Objective_fun == 'RMSE':
             n = obj.rmse(self.Qobs, self.Qsim)
-        elif self.Objective_fun == 'r2':
+        elif self.Objective_fun == 'R2':
             n = 1 - obj.rsquared(self.Qobs, self.Qsim)
-        elif self.Objective_fun == 'rmpw':
+        elif self.Objective_fun == 'RMPW':
             n = obj.peak_(self.Qobs, self.Qsim)
-        elif self.Objective_fun == 'nslf':
+        elif self.Objective_fun == 'NSLF':
             n = obj.low_(self.Qobs, self.Qsim)
         else:
             n = obj.rmse(self.Qobs, self.Qsim)
@@ -129,19 +130,19 @@ class Nam(object):
                 lb = [0.01, 0.01, 0.01, 200, 10, 0.01, 0.01, 0.01, 500, 0, -2]
                 ub = [50, 1000, 1, 1000, 50, 0.99, 0.99, 0.99, 5000, 4, 4]
                 args = (self.P, self.T, self.E, self.area, self.Spinoff, self.Qobs)
-                xopt, fopt  = pso(self.Objective, lb, ub, f_ieqcons=None, args=args, maxiter=self.maxiter, debug=True)
+                xopt, fopt = pso(self.Objective, lb, ub, f_ieqcons=None, args=args, maxiter=self.maxiter, debug=True)
                 self.Qsim, self.St = nam_method(
-                    xopt,self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=False)
+                    xopt, self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=False)
                 self.parameters = xopt
             else:
                 self.parameters = minimize(self.Objective, self.initial, method='SLSQP', bounds=self.bounds,
                                            options={'maxiter': 1e8, 'disp': False})
                 self.Qsim, self.St = nam_method(
-                    self.parameters.x,self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=False)
+                    self.parameters.x, self.States, self.P, self.T, self.E, self.area, self.Spinoff, Cal=False)
                 self.parameters = self.parameters.x
         else:
             self.Qsim, self.St = nam_method(
-                self.initial,self.States, self.P, self.T, self.E, self.area, self.Spinoff)
+                self.initial, self.States, self.P, self.T, self.E, self.area, self.Spinoff)
             self.parameters = self.initial
 
     def update(self):
@@ -298,18 +299,28 @@ class Nam(object):
         return ax
 
 
+params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
+    , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
+    , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
 
-def run():
-    params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
-        , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
-        , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
+# area = 360
+# calibration = True
+# method = 'SLSQP'
+# Objective_fun = 'nse'
+# maxiter = 15
+# folder = r    "C:\Users\cagri\Desktop\NAM_Shinny\Nam"
+
+
+def run(area, params, folder, data,calibration, method, Objective_fun, maxiter):
     States = np.array([0, 0, 0.9 * params[1], 0, 0, 0, 0, 0.1])
-    n = Nam(360, params,States, calibration=True, method='PSO', Objective_fun='nse',maxiter=3)
-    n.process_path = os.path.split(os.path.abspath(__file__))[0]
-    n.Data_file = os.path.join(n.process_path,"Data", "L0123001_2005_2012.csv")
+    n = Nam(area, params, States, calibration=calibration, method=method, Objective_fun=Objective_fun, maxiter=maxiter)
+    n.process_path = folder
+    n.Data_file = os.path.join(n.process_path, "Data", data+".csv")
     n.run()
     n.stats()
     n.update()
-    n.draw()
+    # n.draw()
+    return n.df, n.parameters, n.statistics, n.flowduration
 
-run()
+# run(area, params, folder, calibration, method, Objective_fun, maxiter)
+# L0123001_2005_2012

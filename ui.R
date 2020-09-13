@@ -13,9 +13,12 @@ shinyUI(pageWithSidebar(
                h3("NAM Parameters"),fluidRow(
     column(6,numericInput("area", "Area:", 100, min = 10, max = 1000)),
     column(6,selectInput("basin", "Select Basin", c("Alihoca","Cakit","Darbogaz"), selected = "Alihoca", multiple = FALSE)),
-    column(6,materialSwitch(inputId = "cal", label = "Calibration", inline = T,right = FALSE,status = "danger")),
-    column(6,selectInput("objective", "Objective Function:",
-                         c("NSE","KGE","RMSE","MAE","Volume Error"), selected = "NSE", multiple = FALSE)),
+    column(12,materialSwitch(inputId = "cal", label = "Calibration", inline = T,right = FALSE,status = "danger")),
+    column(4,selectInput("method", "Method:",
+                         c("SLSQP","PSO"), selected = "SLSP", multiple = FALSE)),
+    column(4,selectInput("objective", "Objective Function:",
+                         c("NSE","KGE","RMSE","MAE","Volume Error","RMPW","NSLF"), selected = "NSE", multiple = FALSE)),
+    column(4,numericInput("maxiter", "Max iteration:", 3, min = 1, max = 20)),
     column(6,sliderInput("umax", "Umax:",
                          min = 0, max = 50, value = 25)),
     column(6,sliderInput("lmax", "Lmax:",
@@ -42,7 +45,8 @@ shinyUI(pageWithSidebar(
     column(6,sliderInput("csnow", "Csnow:",
                            min = 0, max = 4, value = 2,step = 0.25
                )),
-               downloadButton("downloadData", "Download Results"))),
+    column(6,downloadButton("downloadData", "Download Results"))
+    )),
   mainPanel(
     
     tabsetPanel(type = "tabs",
