@@ -54,13 +54,13 @@ shinyUI(pageWithSidebar(
   mainPanel(
     
     tabsetPanel(type = "tabs",
-                tabPanel("Plot Data", plotlyOutput(outputId ="input_plot", height = "800px")),
+                tabPanel("Plot Data", plotlyOutput(outputId ="input_plot", height = "1000px")),
                 tabPanel("NAM Results", plotlyOutput(outputId ="data_plot", height = "800px")),
                 tabPanel("Data", DT::dataTableOutput("ysummary")),
                 tabPanel("Model Performance", DT::dataTableOutput("stats",width = "75%")),
                 tabPanel("Model Parameters", DT::dataTableOutput("parameters",width = "75%")),
                 tabPanel("Flow Duration", plotlyOutput(outputId ="flowdur", height = "500px")),
-                tabPanel("Map", leafletOutput("mymap",height = "800px"))
+                tabPanel("State Variables", plotlyOutput("states",height = "800px"))
                 
                 
                 #plotOutput("main_plot", height = "800px")

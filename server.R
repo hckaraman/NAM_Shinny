@@ -11,6 +11,8 @@ library(tidyverse)
 library(raster)
 library(reticulate)
 library(plotly)
+library(vroom)
+library(hrbrthemes)
 
 use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
 # use_python(python = "/usr/bin/python3.8", required = TRUE)
@@ -64,12 +66,32 @@ shinyServer(function(input, output, session) {
   output$input_plot <- renderPlotly({
     df <- data()[[1]]
     df$Date <- as.Date(df$Date, "%m/%d/%Y")
-    pt <- ggplot(df, aes(x=Date)) +
-      geom_line(aes(y = Q), color = "darkred") + 
-      xlab("Date") + ylab("Discharge , m3/s") 
-    fig <- ggplotly(pt)
-    fig
     
+    
+    q1 <- ggplot(df)  + 
+      geom_bar(aes(x=Date, y=P),stat="identity", fill="tan1", colour="#009E73")+
+     ylab("Precipitation (mm)")
+
+    q2 <- ggplot(df)  + 
+      geom_line(aes(x=Date, y=Q),stat="identity", fill="tan1", colour="#56B4E9")+
+      scale_y_continuous("Discharge (3/s)") 
+    
+    q3 <- ggplot(df)  + 
+      geom_line(aes(x=Date, y=Temp),stat="identity", fill="tan1" , colour="#D55E00")+
+      scale_y_continuous("Mean Temperature (°C)") 
+    
+    q4 <- ggplot(df)  + 
+      geom_line(aes(x=Date, y=E),stat="identity", fill="tan1",colour = '#69b3a2')+
+      scale_y_continuous("Pot. Evapotranspration (mm)") 
+    
+    
+    ply1 <- ggplotly(q1)
+    ply2 <- ggplotly(q2)
+    ply3 <- ggplotly(q3)
+    ply4 <- ggplotly(q4)
+    
+    subplot(ply1, ply2,ply3,ply4, nrows = 4,shareX = T, titleY = TRUE,margin = 0.02)
+
   })
   
   output$data_plot <- renderPlotly({
@@ -133,6 +155,41 @@ shinyServer(function(input, output, session) {
     
   })
   
+  output$states <- renderPlotly({
+    
+    df <- newData()[[5]]
+    df$Date <- as.Date(df$Date,"%Y-%m-%d")
+    
+    fig1 <- plot_ly(df, x = ~Date, y = ~u)
+    fig1 <- fig1 %>% add_lines(name = ~"u") %>% layout(
+        xaxis = list(title = "Date"),
+        yaxis = list(title = "U"))
+    fig2 <- plot_ly(df, x = ~Date, y = ~l)
+    fig2 <- fig2 %>% add_lines(name = ~"l") %>% layout(
+      xaxis = list(title = "Date"),
+      yaxis = list(title = "L"))
+    fig3 <- plot_ly(df, x = ~Date, y = ~bf)
+    fig3 <- fig3 %>% add_lines(name = ~"bf") %>% layout(
+      xaxis = list(title = "Date"),
+      yaxis = list(title = "BF"))
+    fig4 <- plot_ly(df, x = ~Date, y = ~if1)
+    fig4 <- fig4 %>% add_lines(name = ~"if1") %>% layout(
+      xaxis = list(title = "Date"),
+      yaxis = list(title = "IF1"))
+    fig <- subplot(fig1, fig2,fig3,fig4)
+    fig1 <- plot_ly(df, x = ~Date, y = ~if2)
+    fig1 <- fig1 %>% add_lines(name = ~"if2")
+    fig2 <- plot_ly(df, x = ~Date, y = ~of1)
+    fig2 <- fig2 %>% add_lines(name = ~"of1")
+    fig3 <- plot_ly(df, x = ~Date, y = ~of2)
+    fig3 <- fig3 %>% add_lines(name = ~"of2")
+    fig4 <- plot_ly(df, x = ~Date, y = ~snow)
+    fig4 <- fig4 %>% add_lines(name = ~"csnow")
+    fig1 <- subplot(fig1, fig2,fig3,fig4)
+    figg <- subplot(fig,fig1,nrows=2)
+    figg
+  })
+  
   # observe({
   #   x <- input$cal
   #   if (x == T ){
@@ -147,6 +204,11 @@ shinyServer(function(input, output, session) {
   
   
 })
+
+plotList <- function(nplots) {
+  lapply(seq_len(nplots), function(x) plot_ly())
+}
+s1 <- subplot(plotList(6), nrows = 2, shareX = TRUE, shareY = TRUE)
 
 
 

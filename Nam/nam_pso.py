@@ -155,6 +155,7 @@ class Nam(object):
         self.flowduration['Qsim_y'] = self.flowdur(self.Qsim)[1]
         self.flowduration['Qobs_x'] = self.flowdur(self.Qobs)[0]
         self.flowduration['Qobs_y'] = self.flowdur(self.Qobs)[1]
+        self.St['Date'] = self.Date
         # self.df.to_csv(os.path.join(self.process_path, self.export), index=True, header=True)
 
     def stats(self):
@@ -321,7 +322,7 @@ def run(area, params, folder, data,calibration, method, Objective_fun, maxiter):
     n.stats()
     n.update()
     # n.draw()
-    return n.df, n.parameters, n.statistics, n.flowduration
+    return n.df, n.parameters, n.statistics, n.flowduration,n.St
 
 # run(area, params, folder, calibration, method, Objective_fun, maxiter)
 # L0123001_2005_2012
