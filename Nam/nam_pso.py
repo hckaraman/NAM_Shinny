@@ -312,10 +312,11 @@ params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
 
 
 def run(area, params, folder, data,calibration, method, Objective_fun, maxiter):
-    States = np.array([0, 0, 0.9 * params[1], 0, 0, 0, 0, 0.1])
+    States = np.array([0+1, 0+1, +10.9 * params[1], 0, 0, 0, 0, 0.1])
     n = Nam(area, params, States, calibration=calibration, method=method, Objective_fun=Objective_fun, maxiter=maxiter)
     n.process_path = folder
-    n.Data_file = os.path.join(n.process_path, "Data", data+".csv")
+    n.Data_file = os.path.join(n.process_path, "Data", data)
+    # n.Data_file = pd.DataFrame(data)
     n.run()
     n.stats()
     n.update()

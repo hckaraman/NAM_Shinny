@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyFiles)
 library(RSQLite)
 library(stringr)
 library(ggplot2)
@@ -10,6 +11,7 @@ library(tidyverse)
 library(raster)
 library(reticulate)
 library(plotly)
+
 use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
 # use_python(python = "/usr/bin/python3.8", required = TRUE)
 
@@ -20,14 +22,54 @@ source_python("./nam_pso.py")
 
 shinyServer(function(input, output, session) {
   
+  
+  data <- reactive({ 
+    req(input$file1) ## ?req #  require that the input is available
+    
+    inFile <- input$file1 
+    
+    # tested with a following dataset: write.csv(mtcars, "mtcars.csv")
+    # and                              write.csv(iris, "iris.csv")
+    df <- read.csv(inFile$datapath)
+
+    
+    results <- list()
+    results$df <- df
+    
+    x <- c('./Data/',input$file1$name)
+    file <- paste(x,collapse = '')
+    write.csv(df,file,row.names=FALSE)
+    
+    results$path <- input$file1$name
+    
+    return(results)
+  })
+
+  
   newData <- reactive({
+    tt <- data()
+    filename <- tt[[2]]
+    df <- tt[[1]]
+    
     params <- c(input$umax, input$lmax, input$cqof, input$ckif
                 ,input$ck12, input$tof, input$tif, input$tg
                 , input$ckbf,input$csnow, 2)
-    print(input$objective)
-    temp <- run(input$area,params,getwd(),input$basin,input$cal,input$method,input$objective,input$maxiter) 
+    # print(input$objective)
+    temp <- run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter) 
     temp[[1]]$date <- as.Date(row.names(temp[[1]]), "%Y-%m-%d")
     temp
+  })
+  
+  
+  output$input_plot <- renderPlotly({
+    df <- data()[[1]]
+    df$Date <- as.Date(df$Date, "%m/%d/%Y")
+    pt <- ggplot(df, aes(x=Date)) +
+      geom_line(aes(y = Q), color = "darkred") + 
+      xlab("Date") + ylab("Discharge , m3/s") 
+    fig <- ggplotly(pt)
+    fig
+    
   })
   
   output$data_plot <- renderPlotly({

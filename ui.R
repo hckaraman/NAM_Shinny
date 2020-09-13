@@ -9,7 +9,11 @@ files <- Sys.glob(file.path('./Data', "*.csv"))
 print(files)
 shinyUI(pageWithSidebar(
   headerPanel("Drought Analysis"),
-  sidebarPanel(h3("Upload Data"),fluidRow( column(6,numericInput("area1", "Area:", 100, min = 10, max = 1000))),
+  sidebarPanel(h3("Upload Data"),fluidRow(fileInput('file1', 'Choose CSV File',
+                                                    accept=c('text/csv', 
+                                                             'text/comma-separated-values,text/plain', 
+                                                             '.csv'))),
+    
                h3("NAM Parameters"),fluidRow(
     column(6,numericInput("area", "Area:", 100, min = 10, max = 1000)),
     column(6,selectInput("basin", "Select Basin", c("Alihoca","Cakit","Darbogaz"), selected = "Alihoca", multiple = FALSE)),
@@ -50,7 +54,8 @@ shinyUI(pageWithSidebar(
   mainPanel(
     
     tabsetPanel(type = "tabs",
-                tabPanel("Plot", plotlyOutput(outputId ="data_plot", height = "800px")),
+                tabPanel("Plot Data", plotlyOutput(outputId ="input_plot", height = "800px")),
+                tabPanel("NAM Results", plotlyOutput(outputId ="data_plot", height = "800px")),
                 tabPanel("Data", DT::dataTableOutput("ysummary")),
                 tabPanel("Model Performance", DT::dataTableOutput("stats",width = "75%")),
                 tabPanel("Model Parameters", DT::dataTableOutput("parameters",width = "75%")),
