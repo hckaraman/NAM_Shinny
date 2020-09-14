@@ -1,0 +1,1 @@
+helpers.installPackages(c("shiny","shinyFiles","shinyWidgets","RSQLite","stringr","ggplot2","zoo","DT","sf","rgdal","tidyverse","raster","reticulate","shinydashboard","plotly","vroom","hrbrthemes","openxlsx"))
