@@ -5,7 +5,6 @@ from func.nam_fun import nam_method
 import numpy as np
 import func.objectivefunctions as obj
 import pandas as pd
-import seaborn
 from matplotlib.gridspec import GridSpec
 from matplotlib.offsetbox import AnchoredText
 from scipy import stats
@@ -15,7 +14,6 @@ from pyswarm import pso
 # endregion
 
 
-seaborn.set()
 np.seterr(all='ignore')
 
 

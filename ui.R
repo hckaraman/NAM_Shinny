@@ -1,11 +1,10 @@
 library(shiny)
-library(RSQLite)
 library(plotly)
 library(shinyWidgets)
 
 
 shinyUI(pageWithSidebar(
-  headerPanel("Drought Analysis"),
+  headerPanel("NAM Lumped Model"),
   sidebarPanel(h3("Upload Data"),fluidRow(fileInput('file1', 'Choose CSV File',
                                                     accept=c('text/csv', 
                                                              'text/comma-separated-values,text/plain', 
