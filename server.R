@@ -5,10 +5,10 @@ library(tidyverse)
 library(reticulate)
 library(plotly)
 library(openxlsx)
-
+library(vroom)
 
 # use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
-use_python(python = "/usr/bin/python3", required = TRUE)
+use_python(python = "/home/cak/Desktop/lake_extraction/venv/bin/python", required = TRUE)
 
 # py_config()
 setwd('./Nam')
@@ -26,8 +26,36 @@ shinyServer(function(input, output, session) {
     
     # tested with a following dataset: write.csv(mtcars, "mtcars.csv")
     # and                              write.csv(iris, "iris.csv")
-    df <- read.csv(inFile$datapath)
+    # df <- read.csv(inFile$datapath)
+    df <- vroom(inFile$datapath)
 
+    # Check NA values in the data
+    
+    na_values <- colSums(is.na(df))
+    na_names <- names(df)
+    dialog_text <- ""
+    
+    # temp <- data.frame(nam_)
+    
+    for (i in 1:length(na_values)) {
+      if ( na_values[i][[1]] != 0) {
+        dialog_text <- paste(dialog_text, "<br>", paste(names(na_values[i][1]) ," data has " ,na_values[i][[1]] ," NA values" ),sep="")
+      }
+    }
+    
+    if (nchar(dialog_text) != 0 ){
+      dialog_text <- paste(dialog_text, "<br>", "No data values has been set to zero!")
+      df[is.na(df)] <- 0 # set no data values to zero
+      showModal(modalDialog(
+        HTML(dialog_text),
+        easyClose = TRUE
+      ))
+    } else {
+      showModal(modalDialog(
+        HTML("Data is free of NA values, yay!"),
+        easyClose = TRUE
+      ))
+    }
     
     results <- list()
     results$df <- df

@@ -302,6 +302,7 @@ params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
     , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
     , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
 
+
 # area = 360
 # calibration = True
 # method = 'SLSQP'
@@ -310,8 +311,8 @@ params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
 # folder = r    "C:\Users\cagri\Desktop\NAM_Shinny\Nam"
 
 
-def run(area, params, folder, data,calibration, method, Objective_fun, maxiter):
-    States = np.array([0+1, 0+1, +10.9 * params[1], 0, 0, 0, 0, 0.1])
+def run(area, params, folder, data, calibration, method, Objective_fun, maxiter):
+    States = np.array([0 + 1, 0 + 1, +10.9 * params[1], 0, 0, 0, 0, 0.1])
     n = Nam(area, params, States, calibration=calibration, method=method, Objective_fun=Objective_fun, maxiter=maxiter)
     n.process_path = folder
     n.Data_file = os.path.join(n.process_path, "Data", data)
@@ -320,7 +321,19 @@ def run(area, params, folder, data,calibration, method, Objective_fun, maxiter):
     n.stats()
     n.update()
     # n.draw()
-    return n.df, n.parameters, n.statistics, n.flowduration,n.St
+    return n.df, n.parameters, n.statistics, n.flowduration, n.St
 
+
+folder = "/home/cak/Desktop/NAM_Shinny/Nam"
+params = [25.0, 500.0, 0.5, 600.0, 30.0, 0.5, 0.5, 0.5, 2500.0, 2.0, 2.0]
+filename = "Sukesen (copy).csv"
+cal = False
+method = "SLSQP"
+objective = "NSE"
+maxiter = 3
+area = 100
+# df = run(area, params, folder, filename, cal, method, objective, maxiter)
+# print("a")
+# run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter)
 # run(area, params, folder, calibration, method, Objective_fun, maxiter)
 # L0123001_2005_2012
