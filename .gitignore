@@ -131,3 +131,9 @@ dmypy.json
 Data (copy)/
 
 Data/
+
+*.csv
+
+*.rar
+
+Nam/NAM/

@@ -9,6 +9,7 @@ library(vroom)
 library(shinycssloaders)
 
 
+
 # use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
 use_python(python = "/home/cak/Desktop/lake_extraction/venv/bin/python", required = TRUE)
 
@@ -79,7 +80,7 @@ shinyServer(function(input, output, session) {
     
     params <- c(input$umax, input$lmax, input$cqof, input$ckif
                 ,input$ck12, input$tof, input$tif, input$tg
-                , input$ckbf,input$csnow, 2)
+                , input$ckbf,input$csnow, input$csnow_melt)
     # print(input$objective)
     
     ## Results
@@ -274,6 +275,34 @@ shinyServer(function(input, output, session) {
       file.copy(myfile, file)
     }
   )
+  
+  
+  output$routing <- renderPlotly({
+    
+    df <- newData()[[1]]
+    inflow<-df$Qsim
+    routingMethod<-c("muskingumcunge")
+    routingParams<-list(k=input$kval,x=input$xval,bedWith=input$bedwith,sideSlope=input$sslope,channelSlope=input$cslope,
+                        manningRoughness=input$manning,riverLength=input$rlength)
+    routingParams1<-list(k=3,x=1,bedWith=50,sideSlope=2,channelSlope=0.0001,
+                        manningRoughness=0.01,riverLength=100)
+    simulation<-list(start=paste(df$date[[1]]),end=paste(df$date[[length(df$date)]]),by=86400)
+    routed <- RHMS::reachRouting(inflow,routingMethod[1],routingParams1,simulation)
+    
+    # inflow <- routed$operation[[1]]
+    outflow <- routed$operation[[2]]
+    # date <- df$date
+    df <- cbind(df,outflow)
+    
+    pt <- ggplot(df, aes(x=date)) + 
+      geom_line(aes(y = Qsim), color = "darkred") + 
+      geom_line(aes(y = outflow), color="steelblue", linetype="twodash") +
+      xlab("Date") + ylab("Discharge , m3/s") 
+    
+    fig <- ggplotly(pt)
+    fig
+    
+  })
   
 })
 

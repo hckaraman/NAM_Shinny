@@ -35,5 +35,16 @@ shinyApp(
 )
 
 
+ui <- shinyUI(fluidPage(
+  fluidRow(
+    column(width=6,
+           fluidRow("Topleft", style = "height:200px; background-color: yellow;"),
+           fluidRow("Bottomleft", style = "height:200px; background-color: green;")),
+    column(width = 6,
+           fluidRow("Topright and Bottomright", style = "height:400px; background-color: grey;opacity: 0.2;")))
+))
+server <- function(input, output) {}
+shinyApp(ui, server)
+
 
 
