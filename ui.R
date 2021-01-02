@@ -1,7 +1,7 @@
 library(shiny)
 library(plotly)
 library(shinyWidgets)
-
+options(spinner.color="#0dc5c1",spinner.size=2,spinner.type = 1)
 
 shinyUI(pageWithSidebar(
   headerPanel("NAM Lumped Model"),
@@ -48,10 +48,9 @@ shinyUI(pageWithSidebar(
     column(6,downloadButton("downloadData", "Download Results"))
     )),
   mainPanel(
-    
     tabsetPanel(type = "tabs",
-                tabPanel("Plot Data", plotlyOutput(outputId ="input_plot", height = "1000px")),
-                tabPanel("NAM Results", plotlyOutput(outputId ="data_plot", height = "800px")),
+                tabPanel("Plot Data", shinycssloaders::withSpinner(plotlyOutput(outputId ="input_plot", height = "1000px"))),
+                tabPanel("NAM Results", shinycssloaders::withSpinner(plotlyOutput(outputId ="data_plot", height = "800px"))),
                 tabPanel("Data", DT::dataTableOutput("ysummary")),
                 tabPanel("Model Performance", DT::dataTableOutput("stats",width = "75%")),
                 tabPanel("Model Parameters", DT::dataTableOutput("parameters",width = "75%")),

@@ -6,6 +6,8 @@ library(reticulate)
 library(plotly)
 library(openxlsx)
 library(vroom)
+library(shinycssloaders)
+
 
 # use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
 use_python(python = "/home/cak/Desktop/lake_extraction/venv/bin/python", required = TRUE)
