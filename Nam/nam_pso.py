@@ -154,10 +154,12 @@ class Nam(object):
         self.df['Qsim'] = self.Qsim
         # self.df['Qfit'] = self.Qfit
         self.flowduration = pd.DataFrame()
-        self.flowduration['Qsim_x'] = self.flowdur(self.Qsim)[0]
-        self.flowduration['Qsim_y'] = self.flowdur(self.Qsim)[1]
-        self.flowduration['Qobs_x'] = self.flowdur(self.Qobs)[0]
-        self.flowduration['Qobs_y'] = self.flowdur(self.Qobs)[1]
+        df_temp = self.df[['Q', 'Qsim']]
+        df_temp = df_temp.dropna()
+        self.flowduration['Qsim_x'] = self.flowdur(df_temp.Qsim)[0]
+        self.flowduration['Qsim_y'] = self.flowdur(df_temp.Qsim)[1]
+        self.flowduration['Qobs_x'] = self.flowdur(df_temp.Q)[0]
+        self.flowduration['Qobs_y'] = self.flowdur(df_temp.Q)[1]
         self.St['Date'] = self.Date[self.Spinoff:]
         # self.df.to_csv(os.path.join(self.process_path, self.export), index=True, header=True)
 
@@ -324,7 +326,6 @@ def run(area, params, folder, data, calibration, method, Objective_fun, maxiter,
     # n.draw()
     return n.df, n.parameters, n.statistics, n.flowduration, n.St
 
-
 # if __name__ == '__main__':
 #     params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
 #         , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
@@ -333,7 +334,7 @@ def run(area, params, folder, data, calibration, method, Objective_fun, maxiter,
 #     folder = "/home/cak/Desktop/NAM_Shinny/Nam"
 #     params = [25.0, 500.0, 0.5, 600.0, 30.0, 0.5, 0.5, 0.5, 2500.0, 2.0, 2.0]
 #     filename = "Sukesen_test_date.csv"
-#     filename = "Alihoca.csv"
+#     filename = "Test_file2.csv"
 #     cal = False
 #     method = "PSO"
 #     objective = "NSE"
@@ -342,6 +343,6 @@ def run(area, params, folder, data, calibration, method, Objective_fun, maxiter,
 #     Spinoff = 30
 #     df = run(area, params, folder, filename, cal, method, objective, maxiter, Spinoff)
 #     print("a")
-    # run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter)
-    # run(area, params, folder, calibration, method, Objective_fun, maxiter)
-    # L0123001_2005_2012
+# run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter)
+# run(area, params, folder, calibration, method, Objective_fun, maxiter)
+# L0123001_2005_2012

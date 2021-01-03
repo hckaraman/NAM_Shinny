@@ -62,7 +62,9 @@ shinyServer(function(input, output, session) {
     if (nchar(dialog_text) != 0) {
       dialog_text <-
         paste(dialog_text, "<br>", "No data values has been set to zero!")
+      temp <-  df$Q
       df[is.na(df)] <- 0 # set no data values to zero
+      df$Q <- temp
       showModal(modalDialog(HTML(dialog_text),
                             easyClose = TRUE))
     } else {
@@ -153,6 +155,8 @@ shinyServer(function(input, output, session) {
     df <- data.frame(par, par_v, temp[[2]])
     names(df) <- c("Parameter", "Description", "Value")
     
+    
+    
     ### Stats
     tt <- temp[[3]]
     metric <- c()
@@ -207,6 +211,9 @@ shinyServer(function(input, output, session) {
     write.xlsx(list_of_datasets, file = './Data/Results.xlsx')
     
     temp
+    
+    
+    
   })
   
   
@@ -214,6 +221,11 @@ shinyServer(function(input, output, session) {
     df <- data()[[1]]
     # df$Date <- as.Date(df$Date, "%m/%d/%Y")
     df$Date <- as.Date(df$Date, "%d/%m/%Y")
+    
+    
+    
+    
+
     
     q1 <- ggplot(df)  +
       geom_bar(
@@ -272,6 +284,18 @@ shinyServer(function(input, output, session) {
   
   output$data_plot <- renderPlotly({
     df <- newData()[[1]]
+    
+    df_par <- newData()[[2]]
+    
+    # Update input parameters
+    pars <- c("umax","lmax","cqof","ckif","ck12","tof","tif","tg","ckbf","csnow","csnow_melt")
+    
+    for (i in 1:length(pars)) {
+      updateNumericInput(session, pars[i], value = round(df_par[[i]],2))
+    }
+    
+    # Update switch
+    updateMaterialSwitch(session, 'cal', value = F)
     
     pt <- ggplot(df, aes(x = date)) +
       geom_line(aes(y = Q), color = "darkred") +

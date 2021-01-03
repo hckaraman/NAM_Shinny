@@ -20,7 +20,7 @@ shinyUI(pageWithSidebar(
                  '.csv')
     )),
     
-    h3("NAM Parameters"),
+    h3("Parameters"),
     tabsetPanel(
       tabPanel(
         "Parameters",
