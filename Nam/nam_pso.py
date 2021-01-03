@@ -20,7 +20,7 @@ np.seterr(all='ignore')
 class Nam(object):
 
     def __init__(self, area, input_parameters, States, calibration=False, method='PSO', Objective_fun='nashsutcliffe',
-                 maxiter=15):
+                 maxiter=15, spinoff=0):
         self._working_directory = None
         self.Data_file = None
         self.df = None
@@ -30,7 +30,7 @@ class Nam(object):
         self.Qobs = None
         self.area = area / (3.6 * 24)
         self.Area = area
-        self.Spinoff = 0
+        self.Spinoff = spinoff
         self.parameters = None
         self.Qfit = None
         self.dfh = None
@@ -67,8 +67,9 @@ class Nam(object):
         pass
 
     def DataRead(self):
+        parser = lambda date: pd.datetime.strptime(date, '%d/%m/%Y')
         self.df = pd.read_csv(self.Data_file, sep=',',
-                              parse_dates=[0], header=0)
+                              parse_dates=[0], header=0, date_parser=parser)
         self.df = self.df.set_index('Date')
 
     def InitData(self):
@@ -76,6 +77,7 @@ class Nam(object):
         self.T = self.df.Temp
         self.E = self.df.E
         self.Qobs = self.df.Q
+        self.Qobs = self.Qobs[self.Spinoff:]
         self.n = self.df.__len__()
         self.Qsim = np.zeros(self.n)
         self.Date = self.df.index.to_pydatetime()
@@ -100,7 +102,7 @@ class Nam(object):
         # denominator = np.nansum((self.Qobs - mean_observed) ** 2)
         # n = 1 - (numerator / denominator)
         # Q = np.where(self.Qobs > 10, np.nan, self.Qobs)
-        wu = 15
+        wu = 0
         if self.Objective_fun == 'NSE':
             n = 1 - obj.nashsutcliffe(self.Qobs[wu:], self.Qsim[wu:])
         elif self.Objective_fun == 'KGE':
@@ -146,6 +148,9 @@ class Nam(object):
     def update(self):
         # fit = self.interpolation()
         # self.Qfit = fit(self.Qobs)
+        self.df = self.df[self.Spinoff:]
+        # temp = np.zeros(self.n)
+        # temp[Spinoff:] = self.Qsim
         self.df['Qsim'] = self.Qsim
         # self.df['Qfit'] = self.Qfit
         self.flowduration = pd.DataFrame()
@@ -153,7 +158,7 @@ class Nam(object):
         self.flowduration['Qsim_y'] = self.flowdur(self.Qsim)[1]
         self.flowduration['Qobs_x'] = self.flowdur(self.Qobs)[0]
         self.flowduration['Qobs_y'] = self.flowdur(self.Qobs)[1]
-        self.St['Date'] = self.Date
+        self.St['Date'] = self.Date[self.Spinoff:]
         # self.df.to_csv(os.path.join(self.process_path, self.export), index=True, header=True)
 
     def stats(self):
@@ -298,11 +303,6 @@ class Nam(object):
         return ax
 
 
-params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
-    , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
-    , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
-
-
 # area = 360
 # calibration = True
 # method = 'SLSQP'
@@ -311,9 +311,10 @@ params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
 # folder = r    "C:\Users\cagri\Desktop\NAM_Shinny\Nam"
 
 
-def run(area, params, folder, data, calibration, method, Objective_fun, maxiter):
+def run(area, params, folder, data, calibration, method, Objective_fun, maxiter, spinoff):
     States = np.array([0 + 1, 0 + 1, +10.9 * params[1], 0, 0, 0, 0, 0.1])
-    n = Nam(area, params, States, calibration=calibration, method=method, Objective_fun=Objective_fun, maxiter=maxiter)
+    n = Nam(area, params, States, calibration=calibration, method=method, Objective_fun=Objective_fun, maxiter=maxiter,
+            spinoff=spinoff)
     n.process_path = folder
     n.Data_file = os.path.join(n.process_path, "Data", data)
     # n.Data_file = pd.DataFrame(data)
@@ -324,16 +325,23 @@ def run(area, params, folder, data, calibration, method, Objective_fun, maxiter)
     return n.df, n.parameters, n.statistics, n.flowduration, n.St
 
 
-folder = "/home/cak/Desktop/NAM_Shinny/Nam"
-params = [25.0, 500.0, 0.5, 600.0, 30.0, 0.5, 0.5, 0.5, 2500.0, 2.0, 2.0]
-filename = "Sukesen (copy).csv"
-cal = False
-method = "SLSQP"
-objective = "NSE"
-maxiter = 3
-area = 100
-# df = run(area, params, folder, filename, cal, method, objective, maxiter)
-# print("a")
-# run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter)
-# run(area, params, folder, calibration, method, Objective_fun, maxiter)
-# L0123001_2005_2012
+# if __name__ == '__main__':
+#     params = [6.96780205e+00, 4.86098809e+02, 6.66247792e-01, 5.42601108e+02
+#         , 2.43815545e+01, 8.21285865e-01, 1.00000000e-02, 1.00000000e-02
+#         , 7.37979357e+02, 9.64180895e-01, 2.06295770e+00]
+#
+#     folder = "/home/cak/Desktop/NAM_Shinny/Nam"
+#     params = [25.0, 500.0, 0.5, 600.0, 30.0, 0.5, 0.5, 0.5, 2500.0, 2.0, 2.0]
+#     filename = "Sukesen_test_date.csv"
+#     filename = "Alihoca.csv"
+#     cal = False
+#     method = "PSO"
+#     objective = "NSE"
+#     maxiter = 3
+#     area = 100
+#     Spinoff = 30
+#     df = run(area, params, folder, filename, cal, method, objective, maxiter, Spinoff)
+#     print("a")
+    # run(input$area,params,getwd(),filename,input$cal,input$method,input$objective,input$maxiter)
+    # run(area, params, folder, calibration, method, Objective_fun, maxiter)
+    # L0123001_2005_2012

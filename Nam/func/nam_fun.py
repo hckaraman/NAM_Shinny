@@ -5,7 +5,7 @@ import pandas as pd
 
 # Define NAM
 
-def nam_method(x,States, P, T, E, area, SpinOff, Cal=False):
+def nam_method(x, States, P, T, E, area, SpinOff, Cal=False):
     c = []
     q = []
     qofmin = 0.4
@@ -175,8 +175,8 @@ def nam_method(x,States, P, T, E, area, SpinOff, Cal=False):
         States[6] = of2
         States[7] = bf
         # Update simulated value
-        if t >= SpinOff:
-            Qsim[t] = (fact * (if2 + of2 + bf))
+        # if t >= SpinOff:
+        Qsim[t] = (fact * (if2 + of2 + bf))
 
         if Cal == False:
             new_dict = dict(zip(keys, (x for x in States)))
@@ -184,5 +184,8 @@ def nam_method(x,States, P, T, E, area, SpinOff, Cal=False):
     # s = str(q)
     # f.write(s + '\n')
     # States[8] = Qsim[t]
+
+    Qsim = Qsim[SpinOff:]
+    St = St[SpinOff:]
 
     return Qsim, St
