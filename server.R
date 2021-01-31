@@ -10,8 +10,7 @@ library(shinycssloaders)
 
 
 
-# use_python(python = "C:\\Users\\cagri\\AppData\\Local\\Programs\\Python\\Python38\\python.exe", required = TRUE)
-use_python(python = "/home/cak/Desktop/lake_extraction/venv/bin/python", required = TRUE)
+use_python(python = "/mnt/s/Hypnotise/Scripts/venv/bin/python", required = TRUE)
 
 # py_config()
 setwd('./Nam')
@@ -59,18 +58,18 @@ shinyServer(function(input, output, session) {
       }
     }
     
-    if (nchar(dialog_text) != 0) {
-      dialog_text <-
-        paste(dialog_text, "<br>", "No data values has been set to zero!")
-      temp <-  df$Q
-      df[is.na(df)] <- 0 # set no data values to zero
-      df$Q <- temp
-      showModal(modalDialog(HTML(dialog_text),
-                            easyClose = TRUE))
-    } else {
-      showModal(modalDialog(HTML("Data is free of NA values, yay!"),
-                            easyClose = TRUE))
-    }
+    # if (nchar(dialog_text) != 0) {
+    #   dialog_text <-
+    #     paste(dialog_text, "<br>", "No data values has been set to zero!")
+    #   temp <-  df$Q
+    #   df[is.na(df)] <- 0 # set no data values to zero
+    #   df$Q <- temp
+    #   showModal(modalDialog(HTML(dialog_text),
+    #                         easyClose = TRUE))
+    # } else {
+    #   showModal(modalDialog(HTML("Data is free of NA values, yay!"),
+    #                         easyClose = TRUE))
+    # }
     
     results <- list()
     results$df <- df
